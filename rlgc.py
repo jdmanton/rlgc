@@ -55,8 +55,9 @@ def main():
 	
 	psf = np.zeros(image.shape)
 	psf[:psf_temp.shape[0], :psf_temp.shape[1], :psf_temp.shape[2]] = psf_temp
-	for axis, axis_size in enumerate(psf_temp.shape):
-		psf = np.roll(psf, -int(axis_size / 2), axis=axis)
+	psf = np.fft.ifftshift(psf)
+	# for axis, axis_size in enumerate(psf_temp.shape):
+		# psf = np.roll(psf, -int(axis_size / 2), axis=axis)
 
 	# if (args.process_psf):	
 		# psf = psf - np.mean(noisy_region)
@@ -71,9 +72,8 @@ def main():
 	psf = cp.array(psf, dtype=cp.float32)
 
 	# Calculate OTF and transpose
-	otf = cp.fft.rfftn(psf)
-	psfT = cp.flip(psf, (0, 1, 2))
-	otfT = cp.fft.rfftn(psfT)
+	otf = cp.fft.fftn(psf)
+	otfT = cp.conjugate(otf)
 
 	# Log which files we're working with and the number of iterations
 	print('')
@@ -201,7 +201,7 @@ def main():
 
 
 def fftconv(x, H):
-	return cp.fft.irfftn(cp.fft.rfftn(x) * H, x.shape)
+	return cp.real(cp.fft.ifftn(cp.fft.fftn(x) * H))
 
 
 if __name__ == '__main__':
