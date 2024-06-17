@@ -15,10 +15,14 @@ def main():
 	psf = psf - args.bg
 	psf[psf < 0] = 0
 
-	x = np.linspace(1, psf.shape[0], psf.shape[0])
-	x = x - psf.shape[0] / 2
-	y = np.linspace(1, psf.shape[1], psf.shape[1])
-	y = y - psf.shape[1] / 2
+	# Add new z-axis if we have 2D data
+	if psf.ndim == 2:
+		psf = np.expand_dims(psf, axis=0)
+
+	x = np.linspace(1, psf.shape[1], psf.shape[1])
+	x = x - psf.shape[1] / 2
+	y = np.linspace(1, psf.shape[2], psf.shape[2])
+	y = y - psf.shape[2] / 2
 	x, y = np.meshgrid(x, y)
 	r = np.sqrt(np.power(x, 2) + np.power(y, 2))
 
