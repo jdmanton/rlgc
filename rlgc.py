@@ -55,9 +55,11 @@ def main():
 	
 	psf = np.zeros(image.shape)
 	psf[:psf_temp.shape[0], :psf_temp.shape[1], :psf_temp.shape[2]] = psf_temp
+	for axis, axis_size in enumerate(psf.shape):
+		psf = np.roll(psf, int(axis_size / 2), axis=axis)
+	for axis, axis_size in enumerate(psf_temp.shape):
+		psf = np.roll(psf, -int(axis_size / 2), axis=axis)
 	psf = np.fft.ifftshift(psf)
-	# for axis, axis_size in enumerate(psf_temp.shape):
-		# psf = np.roll(psf, -int(axis_size / 2), axis=axis)
 
 	# if (args.process_psf):	
 		# psf = psf - np.mean(noisy_region)
