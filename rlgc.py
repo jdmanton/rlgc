@@ -26,6 +26,7 @@ def main():
 	parser.add_argument('--process_psf', type = int, default = 1)
 	parser.add_argument('--rl_output', type = str, required = False)
 	parser.add_argument('--limit', type = float, default = 0.01)
+	parser.add_argument('--max_delta', type = float, default = 0.01)
 	parser.add_argument('--iters_output', type = str, required = False)
 	parser.add_argument('--rl_iters_output', type = str, required = False)
 	parser.add_argument('--updates_output', type = str, required = False)
@@ -164,14 +165,20 @@ def main():
 		calc_time = timeit.default_timer() - start_time
 		num_updated = num_pixels - cp.sum(shouldNotUpdate)
 		max_relative_delta = cp.max((recon - previous_recon) / cp.max(recon))
-		print("Iteration %03d completed in %1.3f s. %1.2f %% of image updated. Update range: %1.2f to %1.2f. Largest relative delta = %1.3f" % (iter + 1, calc_time, 100 * num_updated / num_pixels, cp.min(HTratio), cp.max(HTratio), max_relative_delta))
+		print("Iteration %03d completed in %1.3f s. %1.2f %% of image updated. Update range: %1.2f to %1.2f. Largest relative delta = %1.5f" % (iter + 1, calc_time, 100 * num_updated / num_pixels, cp.min(HTratio), cp.max(HTratio), max_relative_delta))
 
 		num_iters = num_iters + 1
 
 		if (num_updated / num_pixels < args.limit):
+			print('Hit limit')
 			break
 
-		if (max_relative_delta < 0.01):
+		if (max_relative_delta < args.max_delta):
+			print('Hit max delta')
+			break
+
+		if (max_relative_delta < 5 / cp.max(image)):
+			print('Hit auto delta')
 			break
 
 	# Reblur, collect from GPU and save if argument given
