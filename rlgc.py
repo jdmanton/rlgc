@@ -96,8 +96,8 @@ def main():
 
 	# Calculate Richardson-Lucy iterations
 	HTones = fftconv(cp.ones_like(image), otfT)
-	recon = cp.ones((num_z, num_y, num_x))
-	recon_rl = cp.ones((num_z, num_y, num_x))
+	recon = cp.mean(image) * cp.ones((num_z, num_y, num_x))
+	recon_rl = cp.mean(image) * cp.ones((num_z, num_y, num_x))
 
 	if (args.iters_output is not None):
 		iters = np.zeros((args.max_iters, num_z, num_y, num_x))
